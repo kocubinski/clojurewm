@@ -1,4 +1,4 @@
-bin/*
-lib/*
+*.dll
+*.exe
 src/packages/*
 *.suo

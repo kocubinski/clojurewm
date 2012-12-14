@@ -18,4 +18,7 @@ Lots.
 * Configurable hotkey assignment hotkey (currently only Alt-Shift K).
 * Command to display current hotkey list.
 * Make release package.
+* Resorting to minimize/restore window workaround to set the to foreground 
+  window from a separate thread. Not ideal. see 
+  http://stackoverflow.com/questions/3772233/win32-setforegroundwindow-unreliable
 * Bugs?

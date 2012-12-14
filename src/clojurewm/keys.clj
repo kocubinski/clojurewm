@@ -1,10 +1,11 @@
 (ns clojurewm.keys
-  (:require [clojure.tools.logging :as log])
-  (:use [clojurewm.win :only [gen-c-delegate this-proc-addr]]
-        [clojure.clr.pinvoke :only [dllimports]])
+  (:require [clojure.tools.logging :as log]
+            [clojurewm.win :as win])
+  (:use [clojure.clr.pinvoke :only [dllimports]])
   (:import [System.Runtime.InteropServices Marshal]
            [System.Windows.Forms Keys]
-           [System.Threading ThreadPool Thread ThreadStart WaitCallback]))
+           [System.Threading ThreadPool Thread ThreadStart WaitCallback]
+           [System.Windows.Forms MessageBox]))
 
 (def WH_KEYBOARD_LL (int 13))
 (def WM_KEYDOWN 0x100)
@@ -21,11 +22,7 @@
  (CallNextHookEx IntPtr [IntPtr Int32 UInt32 IntPtr])
  (SetWindowsHookEx IntPtr [Int32 IntPtr IntPtr UInt32])
  (UnhookWindowsHookEx Boolean [IntPtr])
- (GetKeyState Int16 [Int32])
- (GetForegroundWindow IntPtr [])
- (SetForegroundWindow Boolean [IntPtr])
- (SetActiveWindow IntPtr [IntPtr])
- (ShowWindow Boolean [IntPtr Int32]))
+ (GetKeyState Int16 [Int32]))
 
 (def key-modifiers [Keys/LControlKey Keys/RControlKey
                     Keys/LMenu Keys/RMenu
@@ -42,33 +39,21 @@
 (defn is-modifier? [key]
   (some #(= key %) key-modifiers))
 
-
-(defn try-focus [window]
-  (ThreadPool/QueueUserWorkItem
-   (gen-delegate |WaitCallback| [state]
-                 (loop [times (range 5)]
-                   (when (seq times)
-                     (ShowWindow window (int 11))
-                     (Thread/Sleep 50)
-                     (ShowWindow window (int 9))
-                     (let [res (SetForegroundWindow window)]
-                       (log/info "SetForegroundWindow:" res)
-                       (when-not res (recur (rest times)))))))))
-
 (defn focus-window [hotkey]
-  (let [{:keys [modifiers window]} hotkey]
+  (let [{:keys [modifiers hwnd]} hotkey]
     (when (= (get-modifiers) modifiers)
       (log/info "Focus window" hotkey)
-      (try-focus window)
+      (win/try-set-foreground-window hwnd)
       (int 1))))
 
 (defn handle-assign-key []
   (log/info "Assigning key..")
   (swap! state assoc :is-assigning true)
+  (MessageBox/Show "Waiting for hotkey")
   (int 1))
 
 (defn assign-key [key]
-  (let [key-map {:key key :modifiers (get-modifiers) :window (GetForegroundWindow)}]
+  (let [key-map {:key key :modifiers (get-modifiers) :hwnd (win/GetForegroundWindow)}]
     (swap! state assoc :is-assigning false)
     (log/info "Got key" key-map)
     (swap! hotkeys assoc key key-map))
@@ -84,7 +69,7 @@
      :else (int 0))))
 
 (def keyboard-hook-proc
-  (gen-c-delegate
+  (win/gen-c-delegate
    Int32 [Int32 UInt32 IntPtr] [n-code w-param l-param]
    (if (>= n-code 0)
      (try 
@@ -102,7 +87,7 @@
 (defn register-hooks []
   (swap! hooks-context assoc :keyboard-hook (SetWindowsHookEx WH_KEYBOARD_LL
                                                               (:fp keyboard-hook-proc)
-                                                              this-proc-addr
+                                                              win/this-proc-addr
                                                               (uint 0)))
   (System.Windows.Forms.Application/Run))
 

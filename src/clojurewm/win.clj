@@ -37,8 +37,3 @@
                 {:dg dg#
                  :gch gch#
                  :fp fp#}))))
-;;;
-
-(dllimports
- "User32.dll"
- (GetForegroundWindow IntPtr []))

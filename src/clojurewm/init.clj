@@ -20,3 +20,5 @@
     (.set_Height height)
     (.set_Left 0)
     (.set_Top window-top)))
+
+(win/hide-info-bar)

@@ -51,35 +51,23 @@
 (defn hide-info-bar []
   (.Hide info-bar))
 
-(defn info-text [text]
+(defn set-info-text [text]
   (let [label (get-control info-bar "text")]
     (set! (. label Text) text)))
 
 (defn clear-info []
-  (info-text ""))
+  (set-info-text ""))
+
+(defn show-info-text [text]
+  (show-info-bar)
+  (set-info-text text))
+;;;
 
 (dllimports
  "User32.dll"
  (GetForegroundWindow IntPtr [])
  (SetForegroundWindow Boolean [IntPtr])
- (SetActiveWindow IntPtr [IntPtr])
- (ShowWindow Boolean [IntPtr Int32])
- (SwitchToThisWindow nil [IntPtr Boolean])
  (BringWindowToTop Boolean [IntPtr]))
-
-;; deprecated?
-(defn try-focus-window [hwnd]
-  (ThreadPool/QueueUserWorkItem
-   (gen-delegate |WaitCallback| [state]
-                 (SwitchToThisWindow hwnd false)
-                 (comment (loop [times (range 5)]
-                            (when (seq times)
-                              (ShowWindow hwnd (int 11))
-                              (Thread/Sleep 50)
-                              (ShowWindow hwnd (int 9))
-                              (let [res (SetForegroundWindow hwnd)]
-                                (log/info "SetForegroundWindow:" res)
-                                (when-not res (recur (rest times))))))))))
 
 (defn try-set-foreground-window [hwnd]
   (loop [times (range 5)]

@@ -42,7 +42,8 @@
       (int 1))))
 
 (defn handle-assign-key []
-  (log/info "Assigning key..")
+  (log/info "Assigning key...")
+  (win/show-info-text "Waiting for keystroke...")
   (swap! state assoc :is-assigning true)
   (int 1))
 
@@ -50,12 +51,12 @@
   (let [key-map {:key key :modifiers (get-modifiers) :hwnd (win/GetForegroundWindow)}]
     (swap! state assoc :is-assigning false)
     (log/info "Got key" key-map)
+    (win/hide-info-bar)
     (swap! hotkeys assoc key key-map))
   (int 1))
 
 (defn handle-key [key key-state]
-  (when (and (= key-state :key-up) (not (is-modifier? key)))
-    (log/info "handle key state" key key-state)
+  (when (and (= key-state :key-down) (not (is-modifier? key)))
     (cond
      (and (= Keys/K key)
           (= (get-modifiers) [Keys/LMenu Keys/LShiftKey])) (handle-assign-key)
@@ -73,12 +74,8 @@
                                               (= w-param WM_SYSKEYDOWN))
                                           :key-down
                                           :key-up))]
-           (do (log/debug "returning" res)
-               res)
-           (do (log/debug "returning 0")
-               ;;(int 0)
-               (CallNextHookEx (:keyboard-hook @hooks-context) n-code w-param l-param)
-               )))
+           res
+           (CallNextHookEx (:keyboard-hook @hooks-context) n-code w-param l-param)))
        (catch Exception ex
          (log/error ex)))
      (CallNextHookEx (:keyboard-hook @hooks-context) n-code w-param l-param))))

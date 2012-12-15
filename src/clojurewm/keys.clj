@@ -58,7 +58,7 @@
 (defn handle-key [key key-state]
   (when (and (= key-state :key-down) (not (is-modifier? key)))
     (cond
-     (and (= Keys/K key)
+     (and (= Keys/T key)
           (= (get-modifiers) [Keys/LMenu Keys/LShiftKey])) (handle-assign-key)
      (@hotkeys key) (focus-window (@hotkeys key))
      (:is-assigning @state) (assign-key key)

@@ -1,8 +1,11 @@
 (ns clojurewm.win
   (:use [clojure.clr.pinvoke]
-        [clojure.clr emit])
+        [clojure.clr emit]
+        [clojurewm.const])
   (:require [clojure.tools.logging :as log])
-  (:import [System.Threading Thread ThreadPool WaitCallback]))
+  (:import [System.Threading Thread ThreadPool WaitCallback]
+           [System.Windows.Forms Label]
+           [System.Drawing Point Size]))
 
 (def this-proc-addr
   (.. (System.Diagnostics.Process/GetCurrentProcess) MainModule BaseAddress))
@@ -26,6 +29,34 @@
        {:dg dg#
         :gch gch#
         :fp fp#})))
+
+;; info bar
+
+(defn get-control [parent name]
+  (first (filter #(= (.Name %) name ) (.Controls parent))))
+
+(def info-bar
+  (let [form (clojurewm.InfoBar.)
+        text (doto (Label.)
+               (.set_Name "text")
+               (.set_Size (Size. 500 30))
+               (.set_Location (Point. 10 10)))]
+    (.Add (.Controls form) text)
+    form))
+
+(defn show-info-bar []
+  (.Show info-bar)
+  (set! (. info-bar TopMost) true))
+
+(defn hide-info-bar []
+  (.Hide info-bar))
+
+(defn info-text [text]
+  (let [label (get-control info-bar "text")]
+    (set! (. label Text) text)))
+
+(defn clear-info []
+  (info-text ""))
 
 (dllimports
  "User32.dll"

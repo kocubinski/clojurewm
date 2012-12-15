@@ -1,17 +1,12 @@
 (ns clojurewm.keys
   (:require [clojure.tools.logging :as log]
             [clojurewm.win :as win])
-  (:use [clojure.clr.pinvoke :only [dllimports]])
+  (:use [clojure.clr.pinvoke :only [dllimports]]
+        [clojurewm.const])
   (:import [System.Runtime.InteropServices Marshal]
            [System.Windows.Forms Keys]
            [System.Threading ThreadPool Thread ThreadStart WaitCallback]
            [System.Windows.Forms MessageBox]))
-
-(def WH_KEYBOARD_LL (int 13))
-(def WM_KEYDOWN 0x100)
-(def WM_KEYUP 0x101)
-(def WM_SYSKEYDOWN 0x104)
-(def WM_SYSKEYUP  0x105)
 
 (def state (atom {:is-assigning false}))
 (def hooks-context (atom {}))
@@ -49,7 +44,6 @@
 (defn handle-assign-key []
   (log/info "Assigning key..")
   (swap! state assoc :is-assigning true)
-  (MessageBox/Show "Waiting for hotkey")
   (int 1))
 
 (defn assign-key [key]
@@ -60,7 +54,8 @@
   (int 1))
 
 (defn handle-key [key key-state]
-  (when (and (= key-state :key-down) (not (is-modifier? key)))
+  (when (and (= key-state :key-up) (not (is-modifier? key)))
+    (log/info "handle key state" key key-state)
     (cond
      (and (= Keys/K key)
           (= (get-modifiers) [Keys/LMenu Keys/LShiftKey])) (handle-assign-key)
@@ -78,8 +73,12 @@
                                               (= w-param WM_SYSKEYDOWN))
                                           :key-down
                                           :key-up))]
-           res
-           (int 0)))
+           (do (log/debug "returning" res)
+               res)
+           (do (log/debug "returning 0")
+               ;;(int 0)
+               (CallNextHookEx (:keyboard-hook @hooks-context) n-code w-param l-param)
+               )))
        (catch Exception ex
          (log/error ex)))
      (CallNextHookEx (:keyboard-hook @hooks-context) n-code w-param l-param))))
@@ -89,7 +88,7 @@
                                                               (:fp keyboard-hook-proc)
                                                               win/this-proc-addr
                                                               (uint 0)))
-  (System.Windows.Forms.Application/Run))
+  (System.Windows.Forms.Application/Run win/info-bar))
 
 (defn remove-hooks []
   (UnhookWindowsHookEx (:keyboard-hook @hooks-context))

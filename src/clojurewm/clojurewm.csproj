@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -41,9 +42,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InfoBar.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InfoBar.Designer.cs">
+      <DependentUpon>InfoBar.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="InfoBar.resx">
+      <DependentUpon>InfoBar.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="init.clj" />
     <EmbeddedResource Include="keys.clj" />
     <EmbeddedResource Include="win.clj" />

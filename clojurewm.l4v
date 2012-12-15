@@ -18,7 +18,7 @@
   <_columns z:Id="7" z:Size="29">
     <ColumnConfig z:Id="8">
       <Id>
-        <u:Value>47</u:Value>
+        <u:Value>77</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="9">Id</FieldName>
@@ -29,7 +29,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="10">
       <Id>
-        <u:Value>48</u:Value>
+        <u:Value>78</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="11">OriginalTime</FieldName>
@@ -40,7 +40,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="12">
       <Id>
-        <u:Value>49</u:Value>
+        <u:Value>79</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="13">Time</FieldName>
@@ -51,7 +51,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="14">
       <Id>
-        <u:Value>50</u:Value>
+        <u:Value>80</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="15">LocalTime</FieldName>
@@ -62,7 +62,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="16">
       <Id>
-        <u:Value>51</u:Value>
+        <u:Value>81</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="17">UtcTime</FieldName>
@@ -73,7 +73,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="18">
       <Id>
-        <u:Value>52</u:Value>
+        <u:Value>82</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="19">Date</FieldName>
@@ -84,7 +84,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="20">
       <Id>
-        <u:Value>53</u:Value>
+        <u:Value>83</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="21">Key</FieldName>
@@ -95,7 +95,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="22">
       <Id>
-        <u:Value>54</u:Value>
+        <u:Value>84</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="23">Level</FieldName>
@@ -106,18 +106,18 @@
     </ColumnConfig>
     <ColumnConfig z:Id="24">
       <Id>
-        <u:Value>55</u:Value>
+        <u:Value>85</u:Value>
       </Id>
       <ClipMode>ClipMiddle</ClipMode>
       <FieldName z:Id="25">Logger</FieldName>
       <Name z:Ref="25" i:nil="true" />
       <Position>3</Position>
-      <Width>285</Width>
+      <Width>101</Width>
       <WindowId>16</WindowId>
     </ColumnConfig>
     <ColumnConfig z:Id="26">
       <Id>
-        <u:Value>56</u:Value>
+        <u:Value>86</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="27">Source</FieldName>
@@ -128,7 +128,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="28">
       <Id>
-        <u:Value>57</u:Value>
+        <u:Value>87</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="29">Message</FieldName>
@@ -139,7 +139,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="30">
       <Id>
-        <u:Value>58</u:Value>
+        <u:Value>88</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="31">Thread</FieldName>
@@ -150,7 +150,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="32">
       <Id>
-        <u:Value>59</u:Value>
+        <u:Value>89</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="33">Host</FieldName>
@@ -161,7 +161,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="34">
       <Id>
-        <u:Value>60</u:Value>
+        <u:Value>90</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="35">Exception</FieldName>
@@ -172,7 +172,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="36">
       <Id>
-        <u:Value>61</u:Value>
+        <u:Value>91</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="37">Domain</FieldName>
@@ -183,7 +183,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="38">
       <Id>
-        <u:Value>62</u:Value>
+        <u:Value>92</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="39">Identity</FieldName>
@@ -194,7 +194,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="40">
       <Id>
-        <u:Value>63</u:Value>
+        <u:Value>93</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="41">User</FieldName>
@@ -205,7 +205,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="42">
       <Id>
-        <u:Value>64</u:Value>
+        <u:Value>94</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="43">Class</FieldName>
@@ -216,7 +216,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="44">
       <Id>
-        <u:Value>65</u:Value>
+        <u:Value>95</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="45">Method</FieldName>
@@ -227,7 +227,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="46">
       <Id>
-        <u:Value>66</u:Value>
+        <u:Value>96</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="47">File</FieldName>
@@ -238,7 +238,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="48">
       <Id>
-        <u:Value>67</u:Value>
+        <u:Value>97</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="49">Line</FieldName>
@@ -249,7 +249,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="50">
       <Id>
-        <u:Value>68</u:Value>
+        <u:Value>98</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="51">NDC</FieldName>
@@ -260,7 +260,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="52">
       <Id>
-        <u:Value>69</u:Value>
+        <u:Value>99</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="53">MDC</FieldName>
@@ -271,7 +271,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="54">
       <Id>
-        <u:Value>70</u:Value>
+        <u:Value>100</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="55">Comment</FieldName>
@@ -282,7 +282,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="56">
       <Id>
-        <u:Value>71</u:Value>
+        <u:Value>101</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="57">StackTrace</FieldName>
@@ -293,7 +293,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="58">
       <Id>
-        <u:Value>72</u:Value>
+        <u:Value>102</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="59">ProcessId</FieldName>
@@ -304,7 +304,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="60">
       <Id>
-        <u:Value>73</u:Value>
+        <u:Value>103</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="61">ThreadId</FieldName>
@@ -315,7 +315,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="62">
       <Id>
-        <u:Value>74</u:Value>
+        <u:Value>104</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="63">CallStack</FieldName>
@@ -326,7 +326,7 @@
     </ColumnConfig>
     <ColumnConfig z:Id="64">
       <Id>
-        <u:Value>75</u:Value>
+        <u:Value>105</u:Value>
       </Id>
       <ClipMode>ClipRight</ClipMode>
       <FieldName z:Id="65">log4net:UserName</FieldName>
@@ -667,7 +667,7 @@
   <_loggers z:Id="122" z:Size="1">
     <LoggerConfig z:Id="123">
       <Id>
-        <u:Value>46</u:Value>
+        <u:Value>76</u:Value>
       </Id>
       <LogLevel z:Ref="2" i:nil="true" />
       <LoggerPath z:Ref="70" i:nil="true" />

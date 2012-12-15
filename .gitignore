@@ -1,4 +1,6 @@
 *.dll
 *.exe
-src/packages/*
+packages/*
+bin/*
 *.suo
+_ReSharper.*

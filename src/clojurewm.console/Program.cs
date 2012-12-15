@@ -1,8 +1,8 @@
-﻿using CommandLine;
+﻿using System.Reflection;
+using CommandLine;
 using clojure.lang.Hosting;
-using System.Windows.Forms;
 
-namespace Console
+namespace clojurewm.console
 {
     class Program
     {
@@ -14,9 +14,9 @@ namespace Console
 
         static private readonly Options options = new Options();
 
-
         static void Main(string[] args)
         {
+            Assembly.Load("clojurewm");
             var cmdParser = new CommandLineParser();
             cmdParser.ParseArguments(args, options);
 

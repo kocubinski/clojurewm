@@ -1,1 +1,1 @@
-bin\Debug\Console.exe --clj
+bin\Debug\clojurewm.console.exe --clj

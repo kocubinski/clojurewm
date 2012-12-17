@@ -48,6 +48,7 @@
     <Compile Include="InfoBar.Designer.cs">
       <DependentUpon>InfoBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Native\SendMessageTimeoutFlags.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

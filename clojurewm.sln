@@ -14,10 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{3BDD39
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clojurewm.run", "src\clojurewm.run\clojurewm.run.csproj", "{DFAC277F-344D-42F5-A166-D95E96289F39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clojurewm.forms", "src\clojurewm.forms\clojurewm.forms.csproj", "{16C5C6D8-E0B6-495A-B37D-75310086690A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clojurewm.wpf", "src\clojurewm.wpf\clojurewm.wpf.csproj", "{1F474B63-6B25-478A-84E1-8A0A967FB160}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,26 +54,6 @@ Global
 		{DFAC277F-344D-42F5-A166-D95E96289F39}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{DFAC277F-344D-42F5-A166-D95E96289F39}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{DFAC277F-344D-42F5-A166-D95E96289F39}.Release|x86.ActiveCfg = Release|Any CPU
-		{16C5C6D8-E0B6-495A-B37D-75310086690A}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{16C5C6D8-E0B6-495A-B37D-75310086690A}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{16C5C6D8-E0B6-495A-B37D-75310086690A}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{16C5C6D8-E0B6-495A-B37D-75310086690A}.Debug|x86.ActiveCfg = Debug|x86
-		{16C5C6D8-E0B6-495A-B37D-75310086690A}.Debug|x86.Build.0 = Debug|x86
-		{16C5C6D8-E0B6-495A-B37D-75310086690A}.Release|Any CPU.ActiveCfg = Release|x86
-		{16C5C6D8-E0B6-495A-B37D-75310086690A}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{16C5C6D8-E0B6-495A-B37D-75310086690A}.Release|Mixed Platforms.Build.0 = Release|x86
-		{16C5C6D8-E0B6-495A-B37D-75310086690A}.Release|x86.ActiveCfg = Release|x86
-		{16C5C6D8-E0B6-495A-B37D-75310086690A}.Release|x86.Build.0 = Release|x86
-		{1F474B63-6B25-478A-84E1-8A0A967FB160}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{1F474B63-6B25-478A-84E1-8A0A967FB160}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{1F474B63-6B25-478A-84E1-8A0A967FB160}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{1F474B63-6B25-478A-84E1-8A0A967FB160}.Debug|x86.ActiveCfg = Debug|x86
-		{1F474B63-6B25-478A-84E1-8A0A967FB160}.Debug|x86.Build.0 = Debug|x86
-		{1F474B63-6B25-478A-84E1-8A0A967FB160}.Release|Any CPU.ActiveCfg = Release|x86
-		{1F474B63-6B25-478A-84E1-8A0A967FB160}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{1F474B63-6B25-478A-84E1-8A0A967FB160}.Release|Mixed Platforms.Build.0 = Release|x86
-		{1F474B63-6B25-478A-84E1-8A0A967FB160}.Release|x86.ActiveCfg = Release|x86
-		{1F474B63-6B25-478A-84E1-8A0A967FB160}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

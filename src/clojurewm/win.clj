@@ -6,7 +6,8 @@
   (:import [System.Threading Thread ThreadPool WaitCallback]
            [System.Windows.Forms Label]
            [System.Drawing Point Size]
-           [System.Text StringBuilder]))
+           [System.Text StringBuilder]
+           [clojurewm.Native SendMessageTimeoutFlags]))
 
 (def this-proc-addr
   (.. (System.Diagnostics.Process/GetCurrentProcess) MainModule BaseAddress))
@@ -70,7 +71,21 @@
  (SetForegroundWindow Boolean [IntPtr])
  (BringWindowToTop Boolean [IntPtr])
  (GetWindowText Int32 [IntPtr StringBuilder Int32])
- (GetWindowTextLength Int32 [IntPtr]))
+ (GetWindowTextLength Int32 [IntPtr])
+ (SendMessageTimeout IntPtr [IntPtr UInt32 UIntPtr IntPtr UInt32 UInt32 IntPtr])
+ (GetWindowThreadProcessId UInt32 [IntPtr IntPtr])
+ (AttachThreadInput Boolean [UInt32 UInt32 Boolean]))
+
+(dllimports
+ "kernel32.dll"
+ (GetCurrentThreadId UInt32 []))
+
+(defn is-window-hung? [hwnd]
+  (=
+   IntPtr/Zero
+   (SendMessageTimeout hwnd (uint WM_NULL) UIntPtr/Zero IntPtr/Zero
+                       (uint (bit-or SMTO_ABORTIFHUNG SMTO_BLOCK))
+                       (uint 3000) IntPtr/Zero)))
 
 (defn get-window-text [hwnd]
   (let [sb (StringBuilder. (inc (GetWindowTextLength hwnd)))]
@@ -92,4 +107,24 @@
       (when (= 1 (count times)) (log/warn "BringWindowToTop failed."))
       (recur (rest times)))))
 
+(defn try-cross-thread-set-foreground-window [hwnd foreground-window]
+  (when-not (is-window-hung? foreground-window)
+    (let [fground-thread (GetWindowThreadProcessId foreground-window IntPtr/Zero)]
+      (when (AttachThreadInput (GetCurrentThreadId) fground-thread true)
+        (let [target-hwnd-thread (GetWindowThreadProcessId hwnd IntPtr/Zero)
+              hwnd-attached? (and (not= fground-thread target-hwnd-thread)
+                                  (AttachThreadInput fground-thread target-hwnd-thread true))]
+          (try-set-foreground-window hwnd)
+          (when hwnd-attached?
+            (AttachThreadInput fground-thread target-hwnd-thread false))
+          (AttachThreadInput (GetCurrentThreadId) fground-thread false))))))
 
+;; TODO parent window checking?
+(defn force-foreground-window [hwnd]
+  (when-not (is-window-hung? hwnd)
+    (let [foreground-window (GetForegroundWindow)]
+      (if (not= hwnd foreground-window)
+        (if (= foreground-window IntPtr/Zero)
+          (try-set-foreground-window hwnd)
+          (try-cross-thread-set-foreground-window hwnd foreground-window))
+        (BringWindowToTop hwnd)))))

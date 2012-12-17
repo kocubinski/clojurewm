@@ -38,7 +38,8 @@
   (let [{:keys [modifiers hwnd]} hotkey]
     (when (= (get-modifiers) modifiers)
       (log/info "Focus window" hotkey)
-      (win/try-set-foreground-window hwnd)
+      ;;(win/try-set-foreground-window hwnd)
+      (win/force-foreground-window hwnd)
       (int 1))))
 
 (defn handle-assign-key []

@@ -61,8 +61,8 @@
     (cond
      (and (= Keys/T key)
           (= (get-modifiers) [Keys/LMenu Keys/LShiftKey])) (handle-assign-key)
-     (@hotkeys key) (focus-window (@hotkeys key))
      (:is-assigning @state) (assign-key key)
+     (@hotkeys key) (focus-window (@hotkeys key))
      :else (int 0))))
 
 (def keyboard-hook-proc

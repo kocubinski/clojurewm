@@ -3,6 +3,7 @@
 (assembly-load "System.Windows.Forms")
 
 (ns clojurewm.init
+  (:use [clojurewm.type])
   (:require [clojure.tools.logging :as log]
             [clojurewm.keys :as keys]
             [clojurewm.win :as win])

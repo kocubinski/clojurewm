@@ -1,13 +1,15 @@
 (ns clojurewm.win
   (:use [clojure.clr.pinvoke]
-        [clojure.clr emit]
-        [clojurewm.const])
-  (:require [clojure.tools.logging :as log])
-  (:import [System.Threading Thread ThreadPool WaitCallback]
-           [System.Windows.Forms Label]
-           [System.Drawing Point Size]
-           [System.Text StringBuilder]
-           [clojurewm.Native SendMessageTimeoutFlags]))
+        [clojurewm.const]
+        [clojurewm.type :only [new-monitor-info]])
+  (:require [clojure.tools.logging :as log]
+            [clojure.clr.emit :as emit])
+  (:import
+   [System.Threading Thread ThreadPool WaitCallback]
+   [System.Windows.Forms Label]
+   [System.Drawing Point Size]
+   [System.Text StringBuilder]
+   [System.Runtime.InteropServices Marshal]))
 
 (def this-proc-addr
   (.. (System.Diagnostics.Process/GetCurrentProcess) MainModule BaseAddress))
@@ -18,7 +20,7 @@
 (defn- get-dg-type [ret-type param-types]
   (let [dg-sig (into [ret-type] param-types)]
     (or (@dg-type-cache dg-sig)
-        (let [dg-type (clr-delegate* ret-type param-types)]
+        (let [dg-type (emit/clr-delegate* ret-type param-types)]
           (swap! dg-type-cache assoc dg-sig dg-type)
           dg-type))))
 
@@ -74,7 +76,15 @@
  (GetWindowTextLength Int32 [IntPtr])
  (SendMessageTimeout IntPtr [IntPtr UInt32 UIntPtr IntPtr UInt32 UInt32 IntPtr])
  (GetWindowThreadProcessId UInt32 [IntPtr IntPtr])
- (AttachThreadInput Boolean [UInt32 UInt32 Boolean]))
+ (AttachThreadInput Boolean [UInt32 UInt32 Boolean])
+ (MonitorFromWindow IntPtr [IntPtr UInt32])
+ (GetMonitorInfo Boolean [IntPtr IntPtr])
+ (CreateWindow IntPtr [StringBuilder StringBuilder
+                       UInt32 Int32 Int32 Int32 Int32
+                       IntPtr IntPtr IntPtr IntPtr])
+ (SetWindowLong Int32 [IntPtr Int32 Int32])
+ (GetWindowLong Int32 [IntPtr Int32])
+ (SetWindowPos Boolean [IntPtr IntPtr Int32 Int32 Int32 Int32 Int32]))
 
 (dllimports
  "kernel32.dll"
@@ -128,3 +138,38 @@
           (try-set-foreground-window hwnd)
           (try-cross-thread-set-foreground-window hwnd foreground-window))
         (BringWindowToTop hwnd)))))
+
+
+(defn get-monitor-info [hwnd]
+  (let [hmon (MonitorFromWindow hwnd MONITOR_DEFAULTTONEAREST)
+        mi (new-monitor-info)
+        ptr-mi (Marshal/AllocHGlobal (Marshal/SizeOf mi))]
+    (Marshal/StructureToPtr mi ptr-mi false)
+    (GetMonitorInfo hmon ptr-mi)
+    (Marshal/PtrToStructure ptr-mi mi)
+    (Marshal/FreeHGlobal ptr-mi)
+    mi))
+
+(comment (CreateWindow (StringBuilder. "static") (StringBuilder. "something foo")
+                           (uint (bit-or WS_POPUP WS_VISIBLE))
+                           (.Left monitor)
+                           (.Top monitor)
+                           (int (- (.Right monitor) (.Left monitor)))
+                           (int (- (.Bottom monitor) (.Top monitor)))
+                           hwnd IntPtr/Zero this-proc-addr IntPtr/Zero
+                           ))
+
+(defn set-fullscreen [hwnd]
+  (let [mi (get-monitor-info hwnd)
+        monitor (.Monitor mi)
+        win-style (GetWindowLong hwnd GWL_STYLE)
+        win-ex-style (GetWindowLong hwnd GWL_EXSTYLE)]
+    (SetWindowLong hwnd GWL_STYLE
+                   (int (bit-and win-style
+                                 (bit-not (bit-or WS_CAPTION WS_THICKFRAME)))))
+    (SetWindowLong hwnd GWL_EXSTYLE
+                   (int (bit-and win-ex-style
+                                 (bit-not (bit-or WS_EX_DLGMODALFRAME WS_EX_WINDOWEDGE
+                                                  WS_EX_CLIENTEDGE WS_EX_STATICEDGE)))))
+    ;;(SetWindowPos hwnd IntPtr/Zero )
+    ))

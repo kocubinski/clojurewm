@@ -5,7 +5,8 @@
   (:require [clojure.tools.logging :as log])
   (:import [System.Threading Thread ThreadPool WaitCallback]
            [System.Windows.Forms Label]
-           [System.Drawing Point Size]))
+           [System.Drawing Point Size]
+           [System.Text StringBuilder]))
 
 (def this-proc-addr
   (.. (System.Diagnostics.Process/GetCurrentProcess) MainModule BaseAddress))
@@ -67,19 +68,28 @@
  "User32.dll"
  (GetForegroundWindow IntPtr [])
  (SetForegroundWindow Boolean [IntPtr])
- (BringWindowToTop Boolean [IntPtr]))
+ (BringWindowToTop Boolean [IntPtr])
+ (GetWindowText Int32 [IntPtr StringBuilder Int32])
+ (GetWindowTextLength Int32 [IntPtr]))
+
+(defn get-window-text [hwnd]
+  (let [sb (StringBuilder. (inc (GetWindowTextLength hwnd)))]
+    (GetWindowText hwnd sb (.Capacity sb))
+    sb))
 
 (defn try-set-foreground-window [hwnd]
   (loop [times (range 5)]
     (when (and (seq times)
                (not (SetForegroundWindow hwnd)))
       (Thread/Sleep 10)
+      (when (= 1 (count times)) (log/warn "SetForegroundWindow failed."))
       (recur (rest times))))
-  (loop [times (range 5)]
+  (loop [times (range 10)]
     (when (and (seq times)
                (not= (GetForegroundWindow) hwnd))
       (Thread/Sleep 30)
       (BringWindowToTop hwnd)
+      (when (= 1 (count times)) (log/warn "BringWindowToTop failed."))
       (recur (rest times)))))
 
 

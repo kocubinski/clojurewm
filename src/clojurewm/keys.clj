@@ -94,12 +94,10 @@
    (if (>= n-code 0)
      (try 
        (let [key (Enum/ToObject Keys (Marshal/ReadInt32 l-param))]
-         (if-let [res (handle-key key (if (or (= w-param WM_KEYDOWN)
-                                              (= w-param WM_SYSKEYDOWN))
-                                          :key-down
-                                          :key-up))]
-           res
-           (CallNextHookEx (:keyboard-hook @hooks-context) n-code w-param l-param)))
+         (handle-key key (if (or (= w-param WM_KEYDOWN)
+                                 (= w-param WM_SYSKEYDOWN))
+                           :key-down
+                           :key-up)))
        (catch Exception ex
          (log/error ex)))
      (CallNextHookEx (:keyboard-hook @hooks-context) n-code w-param l-param))))

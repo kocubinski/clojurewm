@@ -77,9 +77,6 @@
     (GetWindowText hwnd sb (.Capacity sb))
     sb))
 
-(defn track-window [hwnd]
-  )
-
 (defn is-window-hung? [hwnd]
   (=
    IntPtr/Zero

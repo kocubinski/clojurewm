@@ -9,7 +9,9 @@
            [System.Windows.Forms MessageBox]))
 
 (def state (atom {:is-assigning false}))
+
 (def hooks-context (atom {}))
+
 (def hotkeys (atom {}))
 
 (dllimports
@@ -49,12 +51,19 @@
   (int 1))
 
 (defn assign-key [key]
-  (let [key-map {:key key :modifiers (get-modifiers) :hwnd (win/GetForegroundWindow)}]
+  (let [hwnd (win/GetForegroundWindow)
+        key-map {:key key :modifiers (get-modifiers) :hwnd hwnd}]
+    (swap! hotkeys assoc key key-map)
     (swap! state assoc :is-assigning false)
     (log/info "Got key" key-map)
-    (win/hide-info-bar)
-    (swap! hotkeys assoc key key-map))
+    (win/hide-info-bar))
   (int 1))
+
+;;;
+
+(def commands
+  {[Keys/T Keys/LShiftKey Keys/RShiftKey] assign-key
+   [Keys/F Keys/]})
 
 (defn handle-key [key key-state]
   (when (and (= key-state :key-down) (not (is-modifier? key)))
@@ -97,3 +106,4 @@
                 (gen-delegate ThreadStart [] (register-hooks)))]
     (swap! hooks-context assoc :thread thread)
     (.Start thread)))
+

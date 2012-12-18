@@ -1,7 +1,8 @@
 (ns clojurewm.win
   (:use [clojure.clr.pinvoke]
         [clojurewm.const]
-        [clojurewm.type :only [new-monitor-info]])
+        [clojurewm.type :only [new-monitor-info]]
+        [clojurewm.core :only [gen-c-delegate]])
   (:require [clojure.tools.logging :as log]
             [clojure.clr.emit :as emit])
   (:import
@@ -14,25 +15,8 @@
 (def this-proc-addr
   (.. (System.Diagnostics.Process/GetCurrentProcess) MainModule BaseAddress))
 
-(def ^:private dg-type-cache (atom {}))
 
-;; TODO simplify this.
-(defn- get-dg-type [ret-type param-types]
-  (let [dg-sig (into [ret-type] param-types)]
-    (or (@dg-type-cache dg-sig)
-        (let [dg-type (emit/clr-delegate* ret-type param-types)]
-          (swap! dg-type-cache assoc dg-sig dg-type)
-          dg-type))))
-
-(defmacro gen-c-delegate [ret params args & body]
-  (let [dg-type (get-dg-type (eval ret) (eval params))]
-    `(let [dg# (gen-delegate ~dg-type ~args ~@body)
-           gch# (System.Runtime.InteropServices.GCHandle/Alloc
-                 dg#)
-           fp# (System.Runtime.InteropServices.Marshal/GetFunctionPointerForDelegate dg#)]
-       {:dg dg#
-        :gch gch#
-        :fp fp#})))
+(def windows (atom {}))
 
 ;; info bar
 
@@ -79,16 +63,22 @@
  (AttachThreadInput Boolean [UInt32 UInt32 Boolean])
  (MonitorFromWindow IntPtr [IntPtr UInt32])
  (GetMonitorInfo Boolean [IntPtr IntPtr])
- (CreateWindow IntPtr [StringBuilder StringBuilder
-                       UInt32 Int32 Int32 Int32 Int32
-                       IntPtr IntPtr IntPtr IntPtr])
  (SetWindowLong Int32 [IntPtr Int32 Int32])
  (GetWindowLong Int32 [IntPtr Int32])
+ (GetWindowRect Boolean [IntPtr IntPtr])
  (SetWindowPos Boolean [IntPtr IntPtr Int32 Int32 Int32 Int32 Int32]))
 
 (dllimports
  "kernel32.dll"
  (GetCurrentThreadId UInt32 []))
+
+(defn get-window-text [hwnd]
+  (let [sb (StringBuilder. (inc (GetWindowTextLength hwnd)))]
+    (GetWindowText hwnd sb (.Capacity sb))
+    sb))
+
+(defn track-window [hwnd]
+  )
 
 (defn is-window-hung? [hwnd]
   (=
@@ -96,11 +86,6 @@
    (SendMessageTimeout hwnd (uint WM_NULL) UIntPtr/Zero IntPtr/Zero
                        (uint (bit-or SMTO_ABORTIFHUNG SMTO_BLOCK))
                        (uint 3000) IntPtr/Zero)))
-
-(defn get-window-text [hwnd]
-  (let [sb (StringBuilder. (inc (GetWindowTextLength hwnd)))]
-    (GetWindowText hwnd sb (.Capacity sb))
-    sb))
 
 (defn try-set-foreground-window [hwnd]
   (loop [times (range 5)]
@@ -139,7 +124,6 @@
           (try-cross-thread-set-foreground-window hwnd foreground-window))
         (BringWindowToTop hwnd)))))
 
-
 (defn get-monitor-info [hwnd]
   (let [hmon (MonitorFromWindow hwnd MONITOR_DEFAULTTONEAREST)
         mi (new-monitor-info)
@@ -150,20 +134,36 @@
     (Marshal/FreeHGlobal ptr-mi)
     mi))
 
-(comment (CreateWindow (StringBuilder. "static") (StringBuilder. "something foo")
-                           (uint (bit-or WS_POPUP WS_VISIBLE))
-                           (.Left monitor)
-                           (.Top monitor)
-                           (int (- (.Right monitor) (.Left monitor)))
-                           (int (- (.Bottom monitor) (.Top monitor)))
-                           hwnd IntPtr/Zero this-proc-addr IntPtr/Zero
-                           ))
+(defn get-window-rect [hwnd]
+  (let [rect (Activator/CreateInstance clojurewm.RectStruct)
+        ptr-rect (Marshal/AllocHGlobal (Marshal/SizeOf rect))]
+    (Marshal/StructureToPtr rect ptr-rect false)
+    (GetWindowRect hwnd ptr-rect)
+    (Marshal/PtrToStructure ptr-rect rect)
+    (Marshal/FreeHGlobal ptr-rect)
+    rect))
 
+(defn save-window-style [hwnd]
+  (let [win-style (GetWindowLong hwnd GWL_STYLE)
+        win-ex-style (GetWindowLong hwnd GWL_EXSTYLE)
+        rect (get-window-rect hwnd)
+        win-map {:win-style win-style :win-ex-style win-ex-style :rect rect}]
+    (swap! windows assoc hwnd win-map)
+    win-map))
+
+(defn unset-fullscreen [hwnd]
+  (let [{:keys [win-style win-ex-style rect]} (@windows hwnd)]
+    (SetWindowLong hwnd GWL_STYLE win-style)
+    (SetWindowLong hwnd GWL_EXSTYLE win-ex-style)
+    (SetWindowPos hwnd IntPtr/Zero
+                  (.Left rect) (.Top rect) (.Right rect) (.Bottom rect)
+                  (int (bit-or SWP_NOZORDER SWP_NOZORDER SWP_FRAMECHANGED)))))
+
+;; need to possibly restore (if maximized) to properly scale as fullscreen?
 (defn set-fullscreen [hwnd]
   (let [mi (get-monitor-info hwnd)
-        monitor (.Monitor mi)
-        win-style (GetWindowLong hwnd GWL_STYLE)
-        win-ex-style (GetWindowLong hwnd GWL_EXSTYLE)]
+        mon (.Monitor mi)
+        {:keys [win-style win-ex-style]} (save-window-style hwnd)]
     (SetWindowLong hwnd GWL_STYLE
                    (int (bit-and win-style
                                  (bit-not (bit-or WS_CAPTION WS_THICKFRAME)))))
@@ -171,5 +171,7 @@
                    (int (bit-and win-ex-style
                                  (bit-not (bit-or WS_EX_DLGMODALFRAME WS_EX_WINDOWEDGE
                                                   WS_EX_CLIENTEDGE WS_EX_STATICEDGE)))))
-    ;;(SetWindowPos hwnd IntPtr/Zero )
+    (SetWindowPos hwnd IntPtr/Zero
+                  (.Left mon) (.Top mon) (.Right mon) (.Bottom mon)
+                  (int (bit-or SWP_NOZORDER SWP_NOZORDER SWP_FRAMECHANGED)))
     ))

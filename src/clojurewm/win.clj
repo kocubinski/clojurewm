@@ -2,7 +2,7 @@
   (:use [clojure.clr.pinvoke]
         [clojurewm.const]
         [clojurewm.type :only [new-monitor-info]]
-        [clojurewm.core :only [gen-c-delegate]])
+        [clojurewm.core :only [gen-c-delegate defcommand]])
   (:require [clojure.tools.logging :as log]
             [clojure.clr.emit :as emit])
   (:import
@@ -147,7 +147,8 @@
   (let [win-style (GetWindowLong hwnd GWL_STYLE)
         win-ex-style (GetWindowLong hwnd GWL_EXSTYLE)
         rect (get-window-rect hwnd)
-        win-map {:win-style win-style :win-ex-style win-ex-style :rect rect}]
+        win-map {:win-style win-style :win-ex-style win-ex-style :rect rect
+                 :fullscreen true}]
     (swap! windows assoc hwnd win-map)
     win-map))
 
@@ -157,13 +158,14 @@
     (SetWindowLong hwnd GWL_EXSTYLE win-ex-style)
     (SetWindowPos hwnd IntPtr/Zero
                   (.Left rect) (.Top rect) (.Right rect) (.Bottom rect)
-                  (int (bit-or SWP_NOZORDER SWP_NOZORDER SWP_FRAMECHANGED)))))
+                  (int (bit-or SWP_NOZORDER SWP_NOACTIVATE SWP_FRAMECHANGED)))))
 
 ;; need to possibly restore (if maximized) to properly scale as fullscreen?
 (defn set-fullscreen [hwnd]
   (let [mi (get-monitor-info hwnd)
         mon (.Monitor mi)
         {:keys [win-style win-ex-style]} (save-window-style hwnd)]
+    (log/info "setting" hwnd "fullscreen")
     (SetWindowLong hwnd GWL_STYLE
                    (int (bit-and win-style
                                  (bit-not (bit-or WS_CAPTION WS_THICKFRAME)))))
@@ -173,5 +175,12 @@
                                                   WS_EX_CLIENTEDGE WS_EX_STATICEDGE)))))
     (SetWindowPos hwnd IntPtr/Zero
                   (.Left mon) (.Top mon) (.Right mon) (.Bottom mon)
-                  (int (bit-or SWP_NOZORDER SWP_NOZORDER SWP_FRAMECHANGED)))
-    ))
+                  (int (bit-or SWP_NOZORDER SWP_NOACTIVATE SWP_FRAMECHANGED)))))
+
+(defcommand toggle-fullscreen [:F :LMenu :LShiftKey]
+  (let [hwnd (GetForegroundWindow)
+        window (@windows hwnd)]
+    (if (and window (:fullscreen window))
+      (do (unset-fullscreen hwnd)
+          (swap! windows assoc-in [hwnd :fullscreen] false))
+      (set-fullscreen hwnd))))

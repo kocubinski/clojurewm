@@ -68,9 +68,14 @@
       (log/info hotkey (@commands hotkey))
       (@commands hotkey))))
 
+(defn get-hotkey [key]
+  (when-let [hotkey (@hotkeys key)]
+    (when (= (get-modifiers) (:modifiers hotkey))
+      hotkey)))
+
 (defn dispatch-key [key]
   (let [command (get-command key)
-        hotkey (@hotkeys key)]
+        hotkey (get-hotkey key)]
     (cond
      command ((resolve command))
      (:is-assigning @state) (assign-key key)

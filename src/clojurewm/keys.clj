@@ -2,6 +2,7 @@
   (:require [clojure.tools.logging :as log]
             [clojurewm.win :as win])
   (:use [clojure.clr.pinvoke :only [dllimports]]
+        [clojurewm.core :only [gen-c-delegate defcommand commands command-exists?]]
         [clojurewm.const])
   (:import [System.Runtime.InteropServices Marshal]
            [System.Windows.Forms Keys]
@@ -41,45 +42,53 @@
     (when (= (get-modifiers) modifiers)
       (log/info "Focus window" hotkey)
       ;;(win/try-set-foreground-window hwnd)
-      (win/force-foreground-window hwnd)
-      (int 1))))
+      (win/force-foreground-window hwnd))))
 
-(defn handle-assign-key []
+(defcommand handle-assign-key [:T :LMenu :LShiftKey]
   (log/info "Assigning key...")
   (win/show-info-text "Waiting for keystroke...")
-  (swap! state assoc :is-assigning true)
-  (int 1))
+  (swap! state assoc :is-assigning true))
 
-(defn assign-key [key]
+(defn assign-key [key] 
   (let [hwnd (win/GetForegroundWindow)
         key-map {:key key :modifiers (get-modifiers) :hwnd hwnd}]
     (swap! hotkeys assoc key key-map)
     (swap! state assoc :is-assigning false)
     (log/info "Got key" key-map)
-    (win/hide-info-bar))
-  (int 1))
+    (win/hide-info-bar)))
 
 ;;;
 
-(def commands
-  {[Keys/T Keys/LShiftKey Keys/RShiftKey] assign-key
-   [Keys/F Keys/]})
+(defn get-command [key]
+  (when (command-exists? key)
+    (let [modifiers (get-modifiers)
+          hotkey (if (seq modifiers)
+                   (apply conj [key] modifiers)
+                   [key])]
+      (log/info hotkey (@commands hotkey))
+      (@commands hotkey))))
+
+(defn dispatch-key [key]
+  (let [command (get-command key)
+        hotkey (@hotkeys key)]
+    (cond
+     command ((resolve command))
+     (:is-assigning @state) (assign-key key)
+     hotkey (focus-window hotkey)
+     :else :pass-key)))
 
 (defn handle-key [key key-state]
   (when (and (= key-state :key-down) (not (is-modifier? key)))
-    (cond
-     (and (= Keys/T key)
-          (= (get-modifiers) [Keys/LMenu Keys/LShiftKey])) (handle-assign-key)
-     (:is-assigning @state) (assign-key key)
-     (@hotkeys key) (focus-window (@hotkeys key))
-     :else (int 0))))
+    (if (= (dispatch-key key) :pass-key)
+      (int 0)
+      (int 1))))
 
 (def keyboard-hook-proc
-  (win/gen-c-delegate
+  (gen-c-delegate
    Int32 [Int32 UInt32 IntPtr] [n-code w-param l-param]
    (if (>= n-code 0)
      (try 
-       (let [key (Marshal/ReadInt32 l-param)]
+       (let [key (Enum/ToObject Keys (Marshal/ReadInt32 l-param))]
          (if-let [res (handle-key key (if (or (= w-param WM_KEYDOWN)
                                               (= w-param WM_SYSKEYDOWN))
                                           :key-down

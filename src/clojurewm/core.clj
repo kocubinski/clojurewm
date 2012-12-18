@@ -5,7 +5,6 @@
 
 (def ^:private dg-type-cache (atom {}))
 
-(def commands (atom {}))
 
 (defn- get-dg-type [ret-type param-types]
   (let [dg-sig (into [ret-type] param-types)]
@@ -24,13 +23,23 @@
         :gch gch#
         :fp fp#})))
 
-(defn index-command [name keys]
-  (println name keys))
+;; commands
 
-(defmacro defcommand [name keys & body]
-  (let [keys (eval keys)
-        gen-key (fn [key] (eval (symbol (str "System.Windows.Forms.Keys/" (name key)))))
-        ;;hotkeys (vec (map gen-key keys))
-        ]
-    (doseq [key keys]
-      (println (name (eval key))))))
+(def commands (atom {}))
+
+(defn- command-exists?* [key]
+  (some #(= % key)
+        (map first (keys @commands))))
+
+(def command-exists? (memoize command-exists?*))
+
+(defn index-command [cmd-name hotkey]
+  (let [gen-key (fn [key] (eval (symbol (str "System.Windows.Forms.Keys/" (name key)))))
+        hotkey (vec (map gen-key hotkey))
+        cmd-name (symbol (str (. *ns* Name) "/" cmd-name))]
+    (swap! commands assoc hotkey cmd-name)))
+
+(defmacro defcommand [cmd-name hotkey & body]
+  (index-command cmd-name (eval hotkey))
+  `(defn ~cmd-name []
+     ~@body))

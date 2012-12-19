@@ -145,7 +145,7 @@
         win-ex-style (GetWindowLong hwnd GWL_EXSTYLE)
         rect (get-window-rect hwnd)
         win-map {:win-style win-style :win-ex-style win-ex-style :rect rect
-                 :fullscreen true}]
+                 :fullscreen true :hwnd hwnd}]
     (swap! windows assoc hwnd win-map)
     win-map))
 

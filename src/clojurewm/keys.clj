@@ -119,3 +119,9 @@
     (swap! hooks-context assoc :thread thread)
     (.Start thread)))
 
+(defcommand exit-clojurewm [:Q :LMenu :LShiftKey]
+  (win/show-info-text "Exiting...")
+  (Thread/Sleep 500)
+  (doseq [{:keys [hwnd fullscreen]} (vals @win/windows)]
+    (win/unset-fullscreen hwnd))
+  (. (:thread @hooks-context) Abort))

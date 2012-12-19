@@ -22,4 +22,6 @@
     (.set_Left 0)
     (.set_Top window-top)))
 
+(win/set-info-text "Welcome to clojurewm!")
+(System.Threading.Thread/Sleep 1000)
 (win/hide-info-bar)

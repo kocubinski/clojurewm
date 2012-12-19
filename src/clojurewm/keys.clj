@@ -123,5 +123,5 @@
   (win/show-info-text "Exiting...")
   (Thread/Sleep 500)
   (doseq [{:keys [hwnd fullscreen]} (vals @win/windows)]
-    (win/unset-fullscreen hwnd))
+    (when fullscreen (win/unset-fullscreen hwnd)))
   (. (:thread @hooks-context) Abort))

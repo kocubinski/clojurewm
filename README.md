@@ -36,6 +36,15 @@ Assign a hotkey tag to the currently focused window. The next key sequence
 entered will used.  Entering the hotkey again will recall all windows tagged
 with that hotkey.
     
+#### Fullscreen window  
+*Alt-Shift-F*  
+Fullscreen the current window, hiding and borders and title bar. Still in alpha,
+doesn't work propertly for all applications, and behaves oddly on multiple monitors.
+
+#### Quit
+*Alt-Shift-Q*  
+Quit clojurewm.
+
 ## TODO
 Lots.
 * Improve this README.

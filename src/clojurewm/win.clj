@@ -15,13 +15,26 @@
 (def this-proc-addr
   (.. (System.Diagnostics.Process/GetCurrentProcess) MainModule BaseAddress))
 
+;; tracked windows
 
-(def windows (atom {}))
+(def ^:private windows (atom {}))
+
+(defn swap-window! [path value]
+  (swap! windows assoc-in path value))
+
+(defn track-window! [hwnd win-style win-ex-style rect fullscreen]
+  (let [new-wind {:win-style win-style :win-ex-style win-ex-style :rect rect
+                  :fullscreen true :hwnd hwnd}]
+    (swap! windows assoc hwnd new-wind)
+    new-wind))
+
+(defn get-tracked-window [hwnd]
+  (get @windows hwnd))
+
+(defn get-tracked-windows []
+  @windows)
 
 ;; info bar
-
-(defn get-control [parent name]
-  (first (filter #(= (.Name %) name ) (.Controls parent))))
 
 (def info-bar
   (let [form (clojurewm.InfoBar.)
@@ -31,6 +44,9 @@
                (.set_Location (Point. 10 10)))]
     (.Add (.Controls form) text)
     form))
+
+(defn get-control [parent name]
+  (first (filter #(= (.Name %) name ) (.Controls parent))))
 
 (defn show-info-bar []
   (.Show info-bar)
@@ -49,6 +65,7 @@
 (defn show-info-text [text]
   (show-info-bar)
   (set-info-text text))
+
 ;;;
 
 (dllimports
@@ -140,28 +157,24 @@
     (Marshal/FreeHGlobal ptr-rect)
     rect))
 
-(defn save-window-style [hwnd]
+(defn track-window [hwnd]
   (let [win-style (GetWindowLong hwnd GWL_STYLE)
         win-ex-style (GetWindowLong hwnd GWL_EXSTYLE)
-        rect (get-window-rect hwnd)
-        win-map {:win-style win-style :win-ex-style win-ex-style :rect rect
-                 :fullscreen true :hwnd hwnd}]
-    (swap! windows assoc hwnd win-map)
-    win-map))
+        rect (get-window-rect hwnd)]
+    (track-window! hwnd win-style win-ex-style rect false)))
 
-(defn unset-fullscreen [hwnd]
-  (let [{:keys [win-style win-ex-style rect]} (@windows hwnd)]
-    (SetWindowLong hwnd GWL_STYLE win-style)
-    (SetWindowLong hwnd GWL_EXSTYLE win-ex-style)
-    (SetWindowPos hwnd IntPtr/Zero
-                  (.Left rect) (.Top rect) (.Right rect) (.Bottom rect)
-                  (int (bit-or SWP_NOZORDER SWP_NOACTIVATE SWP_FRAMECHANGED)))))
+(defn unset-fullscreen [{:keys [hwnd win-style win-ex-style rect]}]
+  (SetWindowLong hwnd GWL_STYLE win-style)
+  (SetWindowLong hwnd GWL_EXSTYLE win-ex-style)
+  (SetWindowPos hwnd IntPtr/Zero
+                (.Left rect) (.Top rect) (.Right rect) (.Bottom rect)
+                (int (bit-or SWP_NOZORDER SWP_NOACTIVATE SWP_FRAMECHANGED))))
 
 ;; need to possibly restore (if maximized) to properly scale as fullscreen?
 (defn set-fullscreen [hwnd]
   (let [mi (get-monitor-info hwnd)
         mon (.Monitor mi)
-        {:keys [win-style win-ex-style]} (save-window-style hwnd)]
+        {:keys [win-style win-ex-style]} (track-window hwnd)]
     (log/info "setting" hwnd "fullscreen")
     (SetWindowLong hwnd GWL_STYLE
                    (int (bit-and win-style
@@ -176,8 +189,17 @@
 
 (defcommand toggle-fullscreen [:F :LMenu :LShiftKey]
   (let [hwnd (GetForegroundWindow)
-        window (@windows hwnd)]
+        window (get-tracked-window hwnd)]
     (if (and window (:fullscreen window))
-      (do (unset-fullscreen hwnd)
-          (swap! windows assoc-in [hwnd :fullscreen] false))
+      (do (unset-fullscreen window)
+          (swap-window! [hwnd :fullscreen] false))
       (set-fullscreen hwnd))))
+
+;; debug
+
+(defn print-windows []
+  (doseq [{:keys [fullscreen rect hwnd]} (vals @windows)]
+    (println (get-window-text hwnd) "-" hwnd)
+    (println "Left:" (.Left rect) "Right:" (.Right rect)
+             "Top:" (.Top rect) "Bottom:" (.Bottom rect))
+    (println "Fullscreen?" fullscreen)))

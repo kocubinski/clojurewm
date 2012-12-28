@@ -11,6 +11,8 @@
 
 (def hook-context {:thread nil :keyboard-hook nil})
 
+(def ^:dynamic *state* nil)
+
 (def hotkeys (atom {}))
 
 (dllimports
@@ -44,13 +46,13 @@
 (defcommand handle-assign-key [:T :LMenu :LShiftKey]
   (log/info "Assigning key...")
   (win/show-info-text "Waiting for keystroke...")
-  (var-set *state* (assoc (var-get *state*) :is-assigning true)))
+  (set! *state* (assoc *state* :is-assigning true)))
 
 (defn assign-key [key] 
   (let [hwnd (win/GetForegroundWindow)
         key-map {:key key :modifiers (get-modifiers) :hwnd hwnd}]
     (swap! hotkeys assoc key key-map)
-    (var-set *state* (assoc (var-get *state*) :is-assigning false))
+    (set! *state* (assoc *state* :is-assigning false))
     (log/info "Got key" key-map)
     (win/hide-info-bar)))
 
@@ -73,11 +75,10 @@
 
 (defn dispatch-key [key]
   (let [command (get-command key)
-        hotkey (get-hotkey key)
-        state (var-get *state*)]
+        hotkey (get-hotkey key)]
     (cond
      command (command)
-     (:is-assigning state) (assign-key key)
+     (:is-assigning *state*) (assign-key key)
      hotkey (focus-window hotkey)
      :else :pass-key)))
 
@@ -102,7 +103,7 @@
      (CallNextHookEx (:keyboard-hook hook-context) n-code w-param l-param))))
 
 (defn register-hooks []
-  (with-local-vars [*state* {}]
+  (binding [*state* {:is-assigning false}]
     (alter-var-root #'hook-context assoc :keyboard-hook (SetWindowsHookEx
                                                          WH_KEYBOARD_LL
                                                          (:fp keyboard-hook-proc)
@@ -111,7 +112,7 @@
     (System.Windows.Forms.Application/Run win/info-bar)))
 
 (defn remove-hooks []
-  (UnhookWindowsHookEx (:keyboard-hook @hooks-context))
+  (UnhookWindowsHookEx (:keyboard-hook @hook-context))
   (.Abort (:thread hook-context)))
 
 (defn init-hooks []

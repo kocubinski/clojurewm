@@ -55,8 +55,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Clojure">
-      <HintPath>..\..\lib\Clojure.dll</HintPath>
+    <Reference Include="Clojure, Version=1.4.0.0, Culture=neutral, PublicKeyToken=a9dca30791fcda1c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Clojure.1.4.0.1\lib\net40\Clojure.dll</HintPath>
     </Reference>
     <Reference Include="ClojureClrEx, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

@@ -124,6 +124,6 @@
 (defcommand exit-clojurewm [:Q :LMenu :LShiftKey]
   (win/show-info-text "Exiting...")
   (Thread/Sleep 500)
-  (doseq [{:keys [hwnd fullscreen] :as window} (vals win/get-tracked-windows)]
+  (doseq [{:keys [hwnd fullscreen] :as window} (vals (win/get-tracked-windows))]
     (when fullscreen (win/unset-fullscreen window)))
   (. (:thread hook-context) Abort))

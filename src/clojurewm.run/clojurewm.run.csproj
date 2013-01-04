@@ -39,8 +39,9 @@
     <Reference Include="Clojure, Version=1.4.0.0, Culture=neutral, PublicKeyToken=a9dca30791fcda1c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Clojure.1.4.0.1\lib\net40\Clojure.dll</HintPath>
     </Reference>
-    <Reference Include="ClojureClrEx">
-      <HintPath>..\..\lib\ClojureClrEx.dll</HintPath>
+    <Reference Include="ClojureClrEx, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClojureClrEx.0.1.0.0\lib\net40\ClojureClrEx.dll</HintPath>
     </Reference>
     <Reference Include="Common.Logging, Version=2.1.2.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -77,7 +78,9 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

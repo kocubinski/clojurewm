@@ -46,7 +46,7 @@ doesn't work propertly for all applications, and behaves oddly on multiple monit
 Quit clojurewm.
 
 ## Getting clojurewm
-Download the latest release package here: https://dl.dropbox.com/u/101986306/clojurewm-0.01.zip  
+Download the latest release package here: https://dl.dropbox.com/u/101986306/clojurewm-0.02.zip  
 To start clojurewm run `clojurewm.run.exe`  
 To start clojurewm with a REPL run `clojurewm.console.exe --clj` from cmd.
 

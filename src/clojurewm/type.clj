@@ -2,7 +2,7 @@
   (:use clojure.clr.emit)
   (:import [System.Runtime.InteropServices Marshal]))
 
-(def rect-struct
+(defonce rect-struct
   (let [rect-builder (clr-type*
                       (cur-gen-context)
                       "clojurewm.RectStruct" [:SequentialLayout] nil [])]
@@ -12,7 +12,7 @@
     (clr-field* rect-builder "Bottom" Int32 [:Public])
     (.CreateType rect-builder)))
 
-(def monitor-info
+(defonce monitor-info
   (let [mi-builder (clr-type*
                     (cur-gen-context)
                     "clojurewm.MonitorInfo" [:SequentialLayout] nil [])]

@@ -22,8 +22,9 @@ namespace clojurewm.console
 
             Clojure.AddNamespaceDirectoryMapping("clojurewm", @"src\clojurewm");
 
-            var replInit = "(use 'clojurewm.init)";
-            replInit += "(in-ns 'clojurewm.init)";
+            var replInit = "(use 'clojurewm.init)\n" + 
+              "(in-ns 'clojurewm.init)\n" +
+              "(main)";
 
             if (options.ClojureRepl)
                 Clojure.Require("clojure.main").main("-e", replInit, "-r");

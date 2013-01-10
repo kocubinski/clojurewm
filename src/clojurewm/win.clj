@@ -2,7 +2,7 @@
   (:use [clojure.clr.pinvoke]
         [clojurewm.const]
         [clojurewm.type :only [new-monitor-info]]
-        [clojurewm.core :only [gen-c-delegate defcommand]])
+        [clojurewm.util :only [gen-c-delegate defcommand]])
   (:require [clojure.tools.logging :as log]
             [clojure.clr.emit :as emit])
   (:import

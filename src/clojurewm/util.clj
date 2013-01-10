@@ -48,4 +48,8 @@
   `(defn ~cmd-name []
      ~@body))
 
-
+(defn new-linked-list [items]
+  (let [linked-list (|System.Collections.Generic.LinkedList`1[System.Object]|.)]
+    (doseq [item items]
+      (.AddLast linked-list item))
+    linked-list))

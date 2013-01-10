@@ -2,7 +2,8 @@
   (:require [clojure.tools.logging :as log]
             [clojurewm.win :as win])
   (:use [clojure.clr.pinvoke :only [dllimports]]
-        [clojurewm.util :only [gen-c-delegate defcommand commands get-command]]
+        [clojurewm.util :only [gen-c-delegate defcommand commands get-command
+                               new-linked-list]]
         [clojurewm.const])
   (:import [System.Runtime.InteropServices Marshal]
            [System.Windows.Forms Keys]
@@ -47,9 +48,14 @@
 ;; command processing
 
 (defn focus-windows [tag]
-  (let [{:keys [modifiers windows]} tag]
+  (let [{:keys [hotkey windows]} tag
+        window-list (new-linked-list windows)]
     (log/info "Focus windows" tag)
-    (doseq [hwnd windows]
+    (set! *state* (assoc *state* :tag-context {:hotkey hotkey
+                                               :windows window-list
+                                               :cur-win (.First window-list)}))
+    (log/trace "*state*" *state*)
+    (doseq [hwnd (reverse windows)]
       (win/force-foreground-window hwnd))))
 
 (defcommand handle-tag-window [:T :LMenu :LShiftKey]
@@ -58,8 +64,9 @@
   (set! *state* (assoc *state* :is-assigning true)))
 
 (defn tag-window [hotkey]
-  (let [hwnd (win/GetForegroundWindow)]
-    (if (get-tag hotkey)
+  (let [hwnd (win/GetForegroundWindow)
+        tag (get-tag hotkey)]
+    (if tag 
       (swap! tags update-in [hotkey :windows] conj hwnd)
       (swap! tags assoc hotkey (tag. hotkey #{hwnd})))
     (set! *state* (assoc *state* :is-assigning false))
@@ -125,14 +132,24 @@
     (when fullscreen (win/unset-fullscreen window)))
   (. (:thread hook-context) Abort))
 
-
 ;; other commands
 
 (defcommand next-window [:J :LMenu]
-  (log/debug "next-window"))
+  (let [{:keys [windows hotkey cur-win]} (:tag-context *state*)]
+    (println (.Value cur-win))
+    (set! *state* (assoc-in *state* [:tag-context :cur-win] (.Next cur-win)))
+    (comment (if (= (count windows) 1)
+               (set! *state* (assoc-in *state* [:tag-context :windows] (:windows (@tags hotkey))))
+               (set! *state* (assoc-in *state* [:tag-context :windows] (rest windows))))
+             (win/force-foreground-window (first (-> *state* :tag-context :windows))))))
 
 (defcommand prev-window [:K :LMenu]
-  (log/debug "prev-window"))
+  (let [{:keys [windows hotkey]} (:tag-context *state*)]
+    (comment
+      (if (= (count windows) 1)
+        (set! *state* (assoc-in *state* [:tag-context :windows] (:windows (@tags hotkey))))
+        (set! *state* (assoc-in *state* [:tag-context :windows] (butlast windows))))
+      (win/force-foreground-window (last (-> *state* :tag-context :windows))))))
 
 (defcommand clear-hotkey [:C :LMenu :LShiftKey]
   (log/debug "clear-hotkey"))

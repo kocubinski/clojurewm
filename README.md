@@ -3,8 +3,12 @@
 Sick and tired of having no suitable window manager while working in Microsoft
 Windows.
 
-Inspired by xmonad, sroctwm, dwm, windawesome, Actual Window Manager,
+Inspired by xmonad, scrotwm, dwm, windawesome, Actual Window Manager,
 python-windows-tiler, bug.n.
+
+Built with [clojure-clr](https://github.com/clojure/clojure-clr), and 
+[ClojureClrEx](https://github.com/kocubinski/ClojureClrEx) for logging, pinvoke,
+and type building.
 
 ## Motivation
 There is no suitable way to easily organize and recall large numbers of windows

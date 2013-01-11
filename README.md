@@ -47,15 +47,15 @@ doesn't work propertly for all applications, and behaves oddly on multiple
 monitors.
 
 #### Next Window
-*Alt-J*
+*Alt-J*  
 Switch to the next window in the currently active tag.
 
 #### Previous Window
-*Alt-K*
+*Alt-K*  
 Switch to the previous window in the currently active tag.
 
 #### Activate Tag
-*<user defined>*
+*[user defined]*  
 Activate tag and recall (bring to foreground) all windows with this tag. 
 
 #### Quit

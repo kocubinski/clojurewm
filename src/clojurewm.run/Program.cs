@@ -8,7 +8,7 @@ namespace clojurewm.run
         static public void Main(string[] args)
         {
             Assembly.Load("clojurewm");
-            Clojure.Require("clojurewm.init");
+            Clojure.Require("clojurewm.init").main();
         }
     }
 }

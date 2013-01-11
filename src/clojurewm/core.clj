@@ -81,7 +81,7 @@
     (log/info "New tag:" (@tags hotkey))
     (win/hide-info-bar)))
 
-(defn clear-tag [hotkey]
+(defn reset-tag [hotkey]
   (swap! tags dissoc hotkey)
   (set! *state* (assoc *state* :is-clearing-tag false))
   (win/hide-info-bar))
@@ -93,7 +93,7 @@
         tag (get-tag key-sequence)]
     (cond
      command (command)
-     (:is-clearing-tag *state*) (clear-tag key-sequence)
+     (:is-clearing-tag *state*) (reset-tag key-sequence)
      (:is-assigning *state*) (tag-window key-sequence)
      tag (focus-windows tag)
      :else :pass-key)))
@@ -167,4 +167,4 @@
 
 (defcommand clear-tag [:Delete :LMenu :LShiftKey]
   (win/show-info-text "Waiting for hotkey to clear...")
-  (set! *state* (assoc *state* :is-clearing-tag true))))
+  (set! *state* (assoc *state* :is-clearing-tag true)))

@@ -55,7 +55,6 @@
       <DependentUpon>InfoBar.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="init.clj" />
-    <EmbeddedResource Include="keys.clj" />
     <EmbeddedResource Include="win.clj" />
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="core.clj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="util.clj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

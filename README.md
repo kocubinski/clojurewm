@@ -63,7 +63,7 @@ Activate tag and recall (bring to foreground) all windows with this tag.
 Quit clojurewm.
 
 ## Getting clojurewm
-Download the latest release package here: https://dl.dropbox.com/u/101986306/clojurewm-0.02.zip  
+Download the latest release package here: https://dl.dropbox.com/u/101986306/clojurewm-0.03.zip  
 To start clojurewm run `clojurewm.run.exe`  
 To start clojurewm with a REPL run `clojurewm.console.exe --clj` from cmd.
 

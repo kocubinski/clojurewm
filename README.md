@@ -31,7 +31,7 @@ clojurewm will:
 ### Terms
 **window** : any opened window  
 **hotkey** : a key combination (e.g. Alt-1, Alt-Shift-T)  
-**tag** : a hotkey which is assigned to a window.  
+**tag** : a hotkey to which a window or windows are assigned.
 
 ### Commands
 #### Tag window
@@ -43,7 +43,20 @@ with that hotkey.
 #### Fullscreen window  
 *Alt-Shift-F*  
 Fullscreen the current window, hiding and borders and title bar. Still in alpha,
-doesn't work propertly for all applications, and behaves oddly on multiple monitors.
+doesn't work propertly for all applications, and behaves oddly on multiple
+monitors.
+
+#### Next Window
+*Alt-J*
+Switch to the next window in the currently active tag.
+
+#### Previous Window
+*Alt-K*
+Switch to the previous window in the currently active tag.
+
+#### Activate Tag
+*<user defined>*
+Activate tag and recall (bring to foreground) all windows with this tag. 
 
 #### Quit
 *Alt-Shift-Q*  
@@ -55,14 +68,6 @@ To start clojurewm run `clojurewm.run.exe`
 To start clojurewm with a REPL run `clojurewm.console.exe --clj` from cmd.
 
 ## TODO
-* Multiple windows per tag.
-* Configurable hotkey assignment hotkey (currently only Alt-Shift T).
-* Command to display current hotkey list.
+* Configurable hotkey assignment hotkey for commands.
+* Command to display current tag list.
 * Bugs?
-
-
-
-
-
-
-

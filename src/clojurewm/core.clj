@@ -135,21 +135,16 @@
 ;; other commands
 
 (defcommand next-window [:J :LMenu]
-  (let [{:keys [windows hotkey cur-win]} (:tag-context *state*)]
-    (println (.Value cur-win))
-    (set! *state* (assoc-in *state* [:tag-context :cur-win] (.Next cur-win)))
-    (comment (if (= (count windows) 1)
-               (set! *state* (assoc-in *state* [:tag-context :windows] (:windows (@tags hotkey))))
-               (set! *state* (assoc-in *state* [:tag-context :windows] (rest windows))))
-             (win/force-foreground-window (first (-> *state* :tag-context :windows))))))
+  (let [{:keys [windows hotkey cur-win]} (:tag-context *state*)
+        next-win (or (.Next cur-win) (.First windows))]
+    (set! *state* (assoc-in *state* [:tag-context :cur-win] next-win))
+    (win/force-foreground-window (.Value next-win))))
 
 (defcommand prev-window [:K :LMenu]
-  (let [{:keys [windows hotkey]} (:tag-context *state*)]
-    (comment
-      (if (= (count windows) 1)
-        (set! *state* (assoc-in *state* [:tag-context :windows] (:windows (@tags hotkey))))
-        (set! *state* (assoc-in *state* [:tag-context :windows] (butlast windows))))
-      (win/force-foreground-window (last (-> *state* :tag-context :windows))))))
+  (let [{:keys [windows hotkey cur-win]} (:tag-context *state*)
+        prev-win (or (.Previous cur-win) (.Last windows))]
+    (set! *state* (assoc-in *state* [:tag-context :cur-win] prev-win))
+    (win/force-foreground-window (.Value prev-win))))
 
 (defcommand clear-hotkey [:C :LMenu :LShiftKey]
   (log/debug "clear-hotkey"))

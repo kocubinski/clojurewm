@@ -2,6 +2,7 @@
   (:require [clojure.tools.logging :as log]
             [clojurewm.win :as win])
   (:use [clojure.clr.pinvoke :only [dllimports]]
+        [clojure.set :only [difference]]
         [clojurewm.util :only [gen-c-delegate defcommand commands get-command
                                new-linked-list]]
         [clojurewm.const])
@@ -47,14 +48,21 @@
 
 ;; command processing
 
+(defn clean-orphaned-windows
+  "Check for any orphaned windows and return a cleaned set."
+  [windows]
+  (let [new-windows (set (filter win/IsWindow windows))]
+    (doseq [hwnd (difference windows new-windows)]
+      (log/debug "Cleaned orphaned window" hwnd))
+    new-windows))
+
 (defn focus-windows [tag]
   (let [{:keys [hotkey windows]} tag
-        window-list (new-linked-list windows)]
-    (log/info "Focus windows" tag)
-    (set! *state* (assoc *state* :tag-context {:hotkey hotkey
-                                               :windows window-list
-                                               :cur-win (.First window-list)}))
-    (log/trace "*state*" *state*)
+        window-list (new-linked-list windows)
+        tag-context {:hotkey hotkey :windows window-list :cur-win (.First window-list)}]
+    (log/info "Focus tag" tag)
+    (swap! tags assoc-in [hotkey :windows] (clean-orphaned-windows windows))
+    (set! *state* (assoc *state* :tag-context tag-context))
     (doseq [hwnd (reverse windows)]
       (win/force-foreground-window hwnd))))
 

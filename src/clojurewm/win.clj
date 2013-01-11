@@ -72,6 +72,7 @@
  "User32.dll"
  (GetForegroundWindow IntPtr [])
  (SetForegroundWindow Boolean [IntPtr])
+ (IsWindow Boolean [IntPtr])
  (BringWindowToTop Boolean [IntPtr])
  (GetWindowText Int32 [IntPtr StringBuilder Int32])
  (GetWindowTextLength Int32 [IntPtr])

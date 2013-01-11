@@ -1,0 +1,14 @@
+clojurewm
+
+v0.01
+  - Initial release.
+
+v0.02
+  - Add DLR assemblies to build.
+
+v0.03
+  - Add multiple windows per tag.
+  - Add clear tag command to reset a tag.
+  - Add next/previous window commands to switch between windows in the currently
+    active tag.
+

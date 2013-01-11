@@ -81,6 +81,11 @@
     (log/info "New tag:" (@tags hotkey))
     (win/hide-info-bar)))
 
+(defn clear-tag [hotkey]
+  (swap! tags dissoc hotkey)
+  (set! *state* (assoc *state* :is-clearing-tag false))
+  (win/hide-info-bar))
+
 (defn dispatch-key [key]
   (let [modifiers (get-modifiers)
         key-sequence (conj modifiers key)
@@ -88,6 +93,7 @@
         tag (get-tag key-sequence)]
     (cond
      command (command)
+     (:is-clearing-tag *state*) (clear-tag key-sequence)
      (:is-assigning *state*) (tag-window key-sequence)
      tag (focus-windows tag)
      :else :pass-key)))
@@ -154,5 +160,11 @@
     (set! *state* (assoc-in *state* [:tag-context :cur-win] prev-win))
     (win/force-foreground-window (.Value prev-win))))
 
-(defcommand clear-hotkey [:C :LMenu :LShiftKey]
-  (log/debug "clear-hotkey"))
+(defcommand handle-tag-window [:T :LMenu :LShiftKey]
+  (log/info "Assigning key...")
+  (win/show-info-text "Waiting for keystroke...")
+  (set! *state* (assoc *state* :is-assigning true)))
+
+(defcommand clear-tag [:Delete :LMenu :LShiftKey]
+  (win/show-info-text "Waiting for hotkey to clear...")
+  (set! *state* (assoc *state* :is-clearing-tag true))))

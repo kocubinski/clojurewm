@@ -1,6 +1,7 @@
-*.dll
-*.exe
 packages/*
 bin/*
 *.suo
 _ReSharper.*
+src/clojurewm.console/obj/
+src/clojurewm.run/obj/
+src/clojurewm/obj/

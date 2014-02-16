@@ -22,7 +22,7 @@
 
 (dllimports
  "User32.dll"
- (CallNextHookEx IntPtr [IntPtr Int32 UInt32 IntPtr])
+ (CallNextHookEx Int32 [IntPtr Int32 UInt32 IntPtr])
  (SetWindowsHookEx IntPtr [Int32 IntPtr IntPtr UInt32])
  (UnhookWindowsHookEx Boolean [IntPtr])
  (GetKeyState Int16 [Int32]))
@@ -99,10 +99,11 @@
      :else :pass-key)))
 
 (defn handle-key [key key-state]
-  (when (and (= key-state :key-down) (not (is-modifier? key)))
+  (if (and (= key-state :key-down) (not (is-modifier? key)))
     (if (= (dispatch-key key) :pass-key)
       (int 0)
-      (int 1))))
+      (int 1))
+    (int 0)))
 
 ;; init/destruction
 
@@ -111,11 +112,12 @@
    Int32 [Int32 UInt32 IntPtr] [n-code w-param l-param]
    (if (>= n-code 0)
      (try
-       (let [key (Enum/ToObject Keys (Marshal/ReadInt32 l-param))]
-         (handle-key key (if (or (= w-param WM_KEYDOWN)
-                                 (= w-param WM_SYSKEYDOWN))
-                           :key-down
-                           :key-up)))
+       (let [key (Enum/ToObject Keys (Marshal/ReadInt32 l-param))
+             key-state (if (or (= w-param WM_KEYDOWN)
+                               (= w-param WM_SYSKEYDOWN))
+                         :key-down
+                         :key-up)]
+         (handle-key key key-state))
        (catch Exception ex
          (log/error ex)))
      (CallNextHookEx (:keyboard-hook hook-context) n-code w-param l-param))))
